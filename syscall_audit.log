@@ -1,0 +1,45 @@
+2026-04-30 14:10:31,515 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-04-30 14:10:31,515 | INFO | [33mPress CTRL+C to quit[0m
+2026-04-30 14:10:31,526 | INFO |  * Restarting with stat
+2026-04-30 14:10:32,058 | WARNING |  * Debugger is active!
+2026-04-30 14:10:32,063 | INFO |  * Debugger PIN: 100-848-566
+2026-04-30 14:10:52,082 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:52] "OPTIONS /api/login HTTP/1.1" 200 -
+2026-04-30 14:10:52,527 | INFO | LOGIN SUCCESS | USER=admin | IP=127.0.0.1
+2026-04-30 14:10:52,528 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:52] "POST /api/login HTTP/1.1" 200 -
+2026-04-30 14:10:52,532 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:52] "OPTIONS /api/syscalls/available HTTP/1.1" 200 -
+2026-04-30 14:10:52,844 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:52] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:10:52,852 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:52] "GET /api/syscalls/available HTTP/1.1" 200 -
+2026-04-30 14:10:53,158 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:53] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:10:55,219 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:55] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:10:55,486 | INFO | 127.0.0.1 - - [30/Apr/2026 14:10:55] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:01,587 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:01] "OPTIONS /api/syscall/cpu_info HTTP/1.1" 200 -
+2026-04-30 14:11:02,423 | INFO | USER=admin | SYSCALL=cpu_info | STATUS=success | IP=127.0.0.1
+2026-04-30 14:11:02,424 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:02] "GET /api/syscall/cpu_info HTTP/1.1" 200 -
+2026-04-30 14:11:02,438 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:02] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:02,768 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:02] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:04,899 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:04] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:05,213 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:05] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:07,826 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:07] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:08,138 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:08] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:09,665 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:09] "OPTIONS /api/syscall/uptime HTTP/1.1" 200 -
+2026-04-30 14:11:09,983 | INFO | USER=admin | SYSCALL=uptime | STATUS=success | IP=127.0.0.1
+2026-04-30 14:11:09,984 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:09] "GET /api/syscall/uptime HTTP/1.1" 200 -
+2026-04-30 14:11:10,240 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:10] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:10,302 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:10] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:14,908 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:14] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:15,227 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:15] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:24,902 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:24] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:25,219 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:25] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:27,616 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:27] "OPTIONS /api/syscall/uptime HTTP/1.1" 200 -
+2026-04-30 14:11:27,932 | INFO | USER=admin | SYSCALL=uptime | STATUS=success | IP=127.0.0.1
+2026-04-30 14:11:27,932 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:27] "GET /api/syscall/uptime HTTP/1.1" 200 -
+2026-04-30 14:11:28,187 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:28] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:28,252 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:28] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:30,090 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:30] "OPTIONS /api/syscall/network_info HTTP/1.1" 200 -
+2026-04-30 14:11:30,418 | INFO | USER=admin | SYSCALL=network_info | STATUS=success | IP=127.0.0.1
+2026-04-30 14:11:30,419 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:30] "GET /api/syscall/network_info HTTP/1.1" 200 -
+2026-04-30 14:11:30,666 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:30] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:30,730 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:30] "GET /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:34,913 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:34] "OPTIONS /api/logs HTTP/1.1" 200 -
+2026-04-30 14:11:35,223 | INFO | 127.0.0.1 - - [30/Apr/2026 14:11:35] "GET /api/logs HTTP/1.1" 200 -

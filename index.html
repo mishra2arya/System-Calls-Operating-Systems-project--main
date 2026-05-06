@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SecureSysCall — System Call Interface</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #050a0f;
+      --panel: #0a1520;
+      --border: #1a3a5c;
+      --accent: #00d4ff;
+      --accent2: #00ff9f;
+      --danger: #ff4560;
+      --warn: #ffb830;
+      --text: #c8e0f0;
+      --dim: #4a7090;
+      --success: #00ff9f;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-ui: 'Rajdhani', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scan lines effect */
+    body::before {
+      content: '';
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────────── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, #050a0f 0%, #081525 50%, #050a0f 100%);
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo-text {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .logo-text span { color: var(--accent2); }
+
+    .user-bar {
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .role-badge {
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .role-admin { background: var(--danger); color: #fff; }
+    .role-user  { background: var(--accent); color: #000; }
+
+    .btn {
+      padding: 8px 20px;
+      border: 1px solid currentColor;
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btn:hover { filter: brightness(1.3); }
+    .btn-danger { color: var(--danger); border-color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-accent { color: var(--accent); border-color: var(--accent); }
+    .btn-accent:hover { background: var(--accent); color: #000; }
+    .btn-success { color: var(--accent2); border-color: var(--accent2); }
+    .btn-success:hover { background: var(--accent2); color: #000; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    /* ─── LOGIN SCREEN ─────────────────────────────────────── */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 50% 30%, #0a1e35 0%, #050a0f 70%);
+    }
+
+    .login-box {
+      width: 420px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 40px;
+      position: relative;
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .login-title {
+      font-family: var(--font-ui);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .login-sub {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--dim);
+      margin-bottom: 32px;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #060e18;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus { border-color: var(--accent); }
+
+    .hint-box {
+      margin-top: 24px;
+      padding: 12px;
+      border: 1px dashed var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--dim);
+      line-height: 1.8;
+    }
+
+    .hint-box strong { color: var(--accent2); }
+
+    /* ─── DASHBOARD ────────────────────────────────────────── */
+    #dashboard { display: none; }
+
+    .page-title {
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--dim);
+      letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+
+    .page-title span { color: var(--accent); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 24px;
+      position: relative;
+    }
+
+    .panel::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.3;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .panel-title::before {
+      content: '';
+      width: 3px; height: 14px;
+      background: var(--accent);
+    }
+
+    /* ─── STAT CARDS ────────────────────────────────────────── */
+    .stat-card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,212,255,0.1);
+    }
+
+    .stat-card.executing {
+      border-color: var(--accent2);
+      animation: pulse-border 1s infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,159,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(0,255,159,0); }
+    }
+
+    .stat-icon { font-size: 28px; margin-bottom: 8px; }
+    .stat-name {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stat-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    .badge-available { border: 1px solid var(--accent2); color: var(--accent2); }
+    .badge-admin { border: 1px solid var(--warn); color: var(--warn); }
+
+    /* ─── RESULT PANEL ─────────────────────────────────────── */
+    .result-area {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      min-height: 180px;
+    }
+
+    .result-key { color: var(--accent); }
+    .result-val { color: var(--accent2); }
+    .result-placeholder { color: var(--dim); font-style: italic; }
+
+    .exec-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .exec-name {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--accent);
+    }
+
+    .status-pill {
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .status-success { background: rgba(0,255,159,0.15); color: var(--success); border: 1px solid var(--success); }
+    .status-error   { background: rgba(255,69,96,0.15); color: var(--danger); border: 1px solid var(--danger); }
+    .status-idle    { background: rgba(74,112,144,0.2); color: var(--dim); border: 1px solid var(--dim); }
+
+    /* ─── LOG TABLE ─────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    th {
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim);
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(26,58,92,0.4);
+      vertical-align: middle;
+    }
+
+    tr:hover td { background: rgba(0,212,255,0.04); }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .dot-success { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+    .dot-denied  { background: var(--danger);  box-shadow: 0 0 6px var(--danger); }
+    .dot-error   { background: var(--warn);    box-shadow: 0 0 6px var(--warn); }
+
+    /* ─── FLASH MESSAGES ────────────────────────────────────── */
+    #flash {
+      position: fixed; top: 80px; right: 32px;
+      z-index: 1000; display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .flash-msg {
+      padding: 12px 20px;
+      border-left: 3px solid;
+      background: var(--panel);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      min-width: 260px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(40px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    .flash-success { border-color: var(--accent2); color: var(--accent2); }
+    .flash-error   { border-color: var(--danger);  color: var(--danger); }
+
+    /* ─── LOADING ────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── REGISTER TAB ─────────────────────────────────────── */
+    .tab-row {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 10px 24px;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--dim);
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .container { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- FLASH -->
+<div id="flash"></div>
+
+<!-- ─── LOGIN SCREEN ─────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">⬡ SecureSysCall</div>
+    <div class="login-sub">[ AUTHENTICATED SYSTEM CALL INTERFACE v1.0 ]</div>
+
+    <div class="tab-row">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('register')">Register</div>
+    </div>
+
+    <div id="tab-login" class="tab-content active">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-user" placeholder="enter username" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="enter password" onkeydown="if(event.key==='Enter') doLogin()"/>
+      </div>
+      <button class="btn btn-accent" style="width:100%; margin-top:8px;" onclick="doLogin()">
+        ▶ AUTHENTICATE
+      </button>
+      <div class="hint-box">
+        <strong>Default accounts:</strong><br>
+        Admin → admin / admin123<br>
+        User  → user1 / user123
+      </div>
+    </div>
+
+    <div id="tab-register" class="tab-content">
+      <div class="form-group">
+        <label>New Username</label>
+        <input type="text" id="reg-user" placeholder="choose username" autocomplete="off"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-pass" placeholder="choose password"/>
+      </div>
+      <button class="btn btn-success" style="width:100%; margin-top:8px;" onclick="doRegister()">
+        ▶ CREATE ACCOUNT
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DASHBOARD ─────────────────────────────────────── -->
+<div id="dashboard">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">⬡</div>
+      <div class="logo-text">Secure<span>SysCall</span></div>
+    </div>
+    <div class="user-bar">
+      <div class="user-chip">
+        <span id="hdr-user">—</span>
+        <span class="role-badge" id="hdr-role">—</span>
+      </div>
+      <button class="btn btn-danger" onclick="doLogout()">LOGOUT</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-title">// <span>SYSTEM CALL INTERFACE</span> — click a syscall card to execute</div>
+
+    <!-- SYSCALL CARDS -->
+    <div class="grid-3" id="syscall-grid">
+      <!-- filled dynamically -->
+    </div>
+
+    <!-- RESULT + LOGS -->
+    <div class="grid-2">
+      <!-- Result Panel -->
+      <div class="panel">
+        <div class="panel-title">Syscall Result</div>
+        <div class="exec-header">
+          <span class="exec-name" id="exec-name">—</span>
+          <span class="status-pill status-idle" id="exec-status">IDLE</span>
+        </div>
+        <div class="result-area" id="result-area">
+          <span class="result-placeholder">// select a system call to execute...</span>
+        </div>
+      </div>
+
+      <!-- Log Panel -->
+      <div class="panel">
+        <div class="panel-title">Audit Log
+          <button class="btn btn-accent" style="margin-left:auto;padding:4px 12px;font-size:11px;" onclick="loadLogs()">↺ REFRESH</button>
+        </div>
+        <div style="overflow-x:auto;max-height:320px;overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Syscall</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="log-tbody">
+              <tr><td colspan="4" style="color:var(--dim);text-align:center;">loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:5000/api';
+  let TOKEN = '', USER_ROLE = '', USER_NAME = '';
+
+  const SYSCALL_META = {
+    cpu_info:     { icon: '🖥️',  label: 'CPU Info',      desc: 'Processor stats & usage' },
+    memory_info:  { icon: '💾',  label: 'Memory Info',   desc: 'RAM usage & availability' },
+    disk_info:    { icon: '💿',  label: 'Disk Info',     desc: 'Storage usage & free space' },
+    os_info:      { icon: '🖧',  label: 'OS Info',       desc: 'Operating system details' },
+    process_list: { icon: '⚙️',  label: 'Process List',  desc: 'Running process snapshot' },
+    network_info: { icon: '🌐',  label: 'Network Info',  desc: 'Traffic stats (admin)', admin: true },
+    env_vars:     { icon: '🔑',  label: 'Env Variables', desc: 'Environment vars (admin)', admin: true },
+    uptime:       { icon: '⏱️',  label: 'Uptime',        desc: 'System uptime (admin)', admin: true },
+  };
+
+  // ─── Tabs ────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      const names = ['login','register'];
+      t.classList.toggle('active', names[i] === name);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  // ─── Flash ───────────────────────────────────────────
+  function flash(msg, type='success') {
+    const el = document.createElement('div');
+    el.className = `flash-msg flash-${type}`;
+    el.textContent = msg;
+    document.getElementById('flash').appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  // ─── Auth ────────────────────────────────────────────
+  async function doLogin() {
+    const username = document.getElementById('login-user').value.trim();
+    const password = document.getElementById('login-pass').value;
+    if (!username || !password) return flash('Enter credentials', 'error');
+    try {
+      const r = await fetch(`${API}/login`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({username, password})
+      });
+      const d = await r.json();
+      if (!r.ok) return flash(d.error || 'Login failed', 'error');
+      TOKEN = d.token; USER_ROLE = d.role; USER_NAME = d.username;
+      document.getElementById('hdr-user').textContent = USER_NAME;
+      const badge = document.getElementById('hdr-role');
+      badge.textContent = USER_ROLE.toUpperCase();
+      badge.className = 'role-badge role-' + USER_ROLE;
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadSyscalls();
+      loadLogs();
+      flash(`Welcome, ${USER_NAME}!`);
+    } catch(e) {
+      flash('Cannot connect to server. Is the backend running?', 'error');
+    }
+  }
+
+  async function doRegister() {
+    const username = document.getElementById('reg-user').value.trim();
+    const password = document.getElementById('reg-pass').value;
+    if (!username || !password) return flash('Fill all fields', 'error');
+    try {
+      const r = await fetch(`${API}/register`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({username, password})
+      });
+      const d = await r.json();
+      if (!r.ok) return flash(d.error || 'Registration failed', 'error');
+      flash(d.message || 'Registered! You can now login.');
+      switchTab('login');
+      document.getElementById('login-user').value = username;
+    } catch(e) { flash('Connection error', 'error'); }
+  }
+
+  function doLogout() {
+    TOKEN = ''; USER_ROLE = ''; USER_NAME = '';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+  }
+
+  // ─── Syscalls ────────────────────────────────────────
+  async function loadSyscalls() {
+    const r = await fetch(`${API}/syscalls/available`, {
+      headers: {'Authorization': 'Bearer ' + TOKEN}
+    });
+    const d = await r.json();
+    renderSyscallCards(d.syscalls);
+  }
+
+  function renderSyscallCards(available) {
+    const grid = document.getElementById('syscall-grid');
+    grid.innerHTML = '';
+    Object.entries(SYSCALL_META).forEach(([key, meta]) => {
+      const isAvail = available.includes(key);
+      const card = document.createElement('div');
+      card.className = 'stat-card';
+      card.id = 'card-' + key;
+      if (!isAvail) card.style.opacity = '0.4';
+      card.innerHTML = `
+        <div class="stat-icon">${meta.icon}</div>
+        <div class="stat-name">${meta.label}</div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--dim);margin-bottom:10px;">${meta.desc}</div>
+        <span class="stat-badge ${isAvail ? 'badge-available' : 'badge-admin'}">${isAvail ? 'AVAILABLE' : 'ADMIN ONLY'}</span>
+      `;
+      if (isAvail) card.onclick = () => executeSyscall(key);
+      grid.appendChild(card);
+    });
+  }
+
+  async function executeSyscall(name) {
+    document.getElementById('exec-name').textContent = name;
+    document.getElementById('exec-status').className = 'status-pill status-idle';
+    document.getElementById('exec-status').textContent = 'EXECUTING...';
+    document.getElementById('result-area').innerHTML = '<span class="spinner"></span> Executing system call...';
+
+    const card = document.getElementById('card-' + name);
+    if (card) card.classList.add('executing');
+
+    try {
+      const r = await fetch(`${API}/syscall/${name}`, {
+        headers: {'Authorization': 'Bearer ' + TOKEN}
+      });
+      const d = await r.json();
+      if (card) card.classList.remove('executing');
+
+      if (!r.ok) {
+        document.getElementById('exec-status').className = 'status-pill status-error';
+        document.getElementById('exec-status').textContent = 'DENIED';
+        document.getElementById('result-area').innerHTML =
+          `<span style="color:var(--danger);">⛔ ${d.error}</span>`;
+      } else {
+        document.getElementById('exec-status').className = 'status-pill status-success';
+        document.getElementById('exec-status').textContent = 'SUCCESS';
+        document.getElementById('result-area').innerHTML = formatResult(d.result);
+        loadLogs();
+      }
+    } catch(e) {
+      if (card) card.classList.remove('executing');
+      document.getElementById('exec-status').className = 'status-pill status-error';
+      document.getElementById('exec-status').textContent = 'ERROR';
+      document.getElementById('result-area').innerHTML = `<span style="color:var(--danger);">Connection error</span>`;
+    }
+  }
+
+  function formatResult(obj, indent=0) {
+    if (typeof obj !== 'object' || obj === null) {
+      return `<span class="result-val">${obj}</span>`;
+    }
+    if (Array.isArray(obj)) {
+      return obj.slice(0, 8).map(item =>
+        typeof item === 'object'
+          ? `<div style="margin-left:${indent+16}px">${formatResult(item, indent+16)}</div>`
+          : `<span class="result-val">${item}</span>`
+      ).join('') + (obj.length > 8 ? `<span style="color:var(--dim);">...+${obj.length-8} more</span>` : '');
+    }
+    return Object.entries(obj).map(([k,v]) => {
+      if (typeof v === 'object') {
+        return `<div><span class="result-key">${k}</span>: {${formatResult(v, indent+16)}}</div>`;
+      }
+      return `<div style="margin-left:${indent}px"><span class="result-key">${k}</span>: <span class="result-val">${v}</span></div>`;
+    }).join('');
+  }
+
+  // ─── Logs ────────────────────────────────────────────
+  async function loadLogs() {
+    try {
+      const r = await fetch(`${API}/logs`, { headers: {'Authorization': 'Bearer ' + TOKEN} });
+      const logs = await r.json();
+      const tbody = document.getElementById('log-tbody');
+      if (!logs.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:var(--dim);text-align:center;">no logs yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = logs.map(l => {
+        const dot = l.status === 'success' ? 'dot-success' : (l.status === 'denied' ? 'dot-denied' : 'dot-error');
+        return `<tr>
+          <td style="color:var(--dim)">${l.timestamp.slice(11)}</td>
+          <td style="color:var(--text)">${l.username}</td>
+          <td style="color:var(--accent)">${l.syscall}</td>
+          <td><span class="status-dot ${dot}"></span>${l.status}</td>
+        </tr>`;
+      }).join('');
+    } catch(e) {}
+  }
+
+  // Auto-refresh logs every 10s
+  setInterval(() => { if (TOKEN) loadLogs(); }, 10000);
+</script>
+</body>
+</html>
